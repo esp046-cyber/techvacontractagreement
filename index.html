@@ -113,8 +113,8 @@ html,body{height:100%;font-family:var(--fb);font-size:var(--t2);color:var(--ink)
 .ctag.req{background:#E0F2FE;color:#0369A1}
 .ctag.ai{background:#F3E8FF;color:#7C3AED}
 .ctag.adv{background:#FEF9C3;color:#854D0E}
-.cb{padding:0 14px;max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s}
-.cb.open{max-height:500px;padding:13px 14px}
+.cb{padding:0 14px;max-height:0;overflow:hidden;transition:max-height .35s ease,padding .3s}
+.cb.open{max-height:900px;padding:13px 14px}
 .chev{transition:transform .3s;flex-shrink:0}
 .chev.open{transform:rotate(180deg)}
 
@@ -223,6 +223,7 @@ html,body{height:100%;font-family:var(--fb);font-size:var(--t2);color:var(--ink)
 #asd{position:fixed;bottom:74px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--line);z-index:99;transition:background .3s}
 #asd.saving{background:#F59E0B}
 #asd.saved{background:#22C55E}
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;width:min(90vw,360px)}
 
 /* ── INSTALL BANNER ── */
 #inst{display:none;background:linear-gradient(135deg,var(--red),var(--red-d));color:var(--w);padding:12px 16px;border-radius:var(--r);margin-bottom:14px;align-items:center;justify-content:space-between;gap:12px}
@@ -266,7 +267,7 @@ html,body{height:100%;font-family:var(--fb);font-size:var(--t2);color:var(--ink)
     <div class="stat"><div class="sv" id="s-active">0</div><div class="sl">Active</div></div>
     <div class="stat d"><div class="sv" id="s-rev">₱0</div><div class="sl">Revenue</div></div>
   </div>
-  <div class="g2 np"><button class="btn bp" onclick="nav('create')"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Contract</button><button class="btn bs" onclick="nav('log')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/></svg>Contracts</button></div>
+  <div class="g2 np"><button class="btn bp" onclick="newContract()"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Contract</button><button class="btn bs" onclick="nav('log')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/></svg>Contracts</button></div>
   <div class="card"><div class="sh">Revenue Chart</div><div id="rev-chart"></div></div>
   <div class="card"><div class="sh">Recent Contracts</div><div id="dash-recent"><p style="color:var(--ink4);font-size:13px;text-align:center;padding:18px 0">No contracts yet — create your first!</p></div></div>
   <div class="card-g" style="display:flex;align-items:center;gap:13px">
@@ -379,7 +380,7 @@ html,body{height:100%;font-family:var(--fb);font-size:var(--t2);color:var(--ink)
     <div style="display:flex;align-items:flex-start;gap:9px"><input type="checkbox" id="f-consent" style="width:18px;height:18px;margin-top:1px;accent-color:var(--red);flex-shrink:0"><label for="f-consent" style="font-size:13px;color:var(--ink2);cursor:pointer;line-height:1.5">I confirm the above consent and authorize this digital signature</label></div>
   </div>
 
-  <div class="g2 np"><button class="btn bg" onclick="saveDraft()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>Save Draft</button><button class="btn bp" onclick="genContract()"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Generate</button></div>
+  <div class="g2 np"><button class="btn bg" onclick="saveDraft()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>Save Draft</button><button class="btn bp" id="gen-btn" onclick="genContract()"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Generate</button></div>
 </div>
 
 <!-- ════ PREVIEW ════ -->
@@ -395,7 +396,7 @@ html,body{height:100%;font-family:var(--fb);font-size:var(--t2);color:var(--ink)
     <button class="wfb" onclick="setStatus('Completed')">Completed</button>
   </div>
   <div class="g3 np"><button class="btn bp bsm" onclick="exportPDF()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Export PDF</button><button class="btn bs bsm" onclick="printDoc()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Print</button><button class="btn bg bsm" onclick="saveContract()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/></svg>Save</button></div>
-  <div class="shr np"><button class="btn bsm bg" onclick="emailC()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email Client</button><button class="btn bsm bg" onclick="copyTxt()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copy Text</button><button class="btn bsm bg" onclick="openCO()"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Change Order</button></div>
+  <div class="shr np"><button class="btn bsm bg" onclick="emailC()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email Client</button><button class="btn bsm bg" onclick="copyTxt()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copy Text</button><button class="btn bsm bg" onclick="openCO()"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Change Order</button><button class="btn bsm bs" onclick="newContract()"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Contract</button></div>
   <div id="preview-wrap"><div id="preview-doc" class="doc"><div style="text-align:center;padding:44px 20px;color:var(--ink4)"><svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="opacity:.3;margin-bottom:11px"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><p>Generate a contract first.</p></div></div></div>
 </div>
 
@@ -475,7 +476,7 @@ html,body{height:100%;font-family:var(--fb);font-size:var(--t2);color:var(--ink)
 // ═══════════════════════════════════
 const MAN={name:"ContractAI Studio 2026",short_name:"ContractAI",start_url:"./",display:"standalone",background_color:"#ffffff",theme_color:"#C8392B",icons:[{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%23C8392B'/%3E%3C/svg%3E",sizes:"512x512",type:"image/svg+xml"}]};
 const mL=document.createElement('link');mL.rel='manifest';mL.href=URL.createObjectURL(new Blob([JSON.stringify(MAN)],{type:'application/json'}));document.head.appendChild(mL);
-const SW=`const C='cai-v3';self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(['/'])));self.skipWaiting()});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim()});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>new Response('Offline'))))});`;
+const SW=`const C='cai-v3';self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll([self.location.href,'./'])));self.skipWaiting()});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim()});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>new Response('<h1>Offline</h1><p>ContractAI Studio is offline. Open from your home screen to use cached version.</p>',{headers:{'Content-Type':'text/html'}}))))});`;
 if('serviceWorker' in navigator)navigator.serviceWorker.register(URL.createObjectURL(new Blob([SW],{type:'text/javascript'}))).catch(()=>{});
 let dI=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dI=e;document.getElementById('inst').classList.add('show');});
@@ -551,7 +552,7 @@ const CLAUSES=[
    text:`The parties agree to first attempt to resolve any dispute through good-faith negotiation for thirty (30) days from written notice of the dispute. If unresolved, the parties shall participate in non-binding mediation before a mutually agreed mediator in [GOVERNING_LAW]. If mediation fails, disputes shall be resolved by binding arbitration under the Rules of the Philippine Dispute Resolution Center, Inc. (PDRC), with: one (1) arbitrator mutually agreed upon or appointed by PDRC; seat of arbitration in Pasig City, Philippines; proceedings conducted in English; and the prevailing party entitled to recover reasonable attorneys' fees and arbitration costs.`},
   {key:'governing',label:'Governing Law & Jurisdiction',tag:'REQUIRED',
    text:`This agreement shall be governed by and construed in accordance with the laws of the [GOVERNING_LAW], without regard to its conflict of law provisions. For disputes not subject to arbitration, both parties consent to the exclusive jurisdiction of the appropriate courts of [GOVERNING_LAW]. The United Nations Convention on Contracts for the International Sale of Goods shall not apply to this Agreement.`},
-  {key:'independent_contractor2',label:'Non-Solicitation',tag:'ADVISORY',
+  {key:'nonsolicitation',label:'Non-Solicitation',tag:'ADVISORY',
    text:`During the term of this agreement and for twelve (12) months following termination, neither party shall directly solicit, recruit, or hire the other party's employees, contractors, or key personnel without prior written consent. This clause does not restrict general public job advertisements or hiring individuals who respond independently to public postings.`},
   {key:'noncompete',label:'Non-Compete (Limited)',tag:'ADVISORY',
    text:`During the term of this agreement and for six (6) months following termination, the Freelancer agrees not to directly build substantially similar [CATEGORY] automation systems for the Client's identified direct competitors using the same proprietary logic, architecture, or workflows developed under this project. This restriction does not prevent the Freelancer from providing general [CATEGORY] services to clients in unrelated industries.`},
@@ -666,7 +667,7 @@ function initCanvas(){
   ['mouseup','touchend','mouseleave'].forEach(ev=>c.addEventListener(ev,()=>drawing=false));
 }
 function dLine(ctx,x1,y1,x2,y2){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle='#1C1917';ctx.lineWidth=2;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();}
-function clrSig(){document.getElementById('sig-canvas').getContext('2d').clearRect(0,0,9999,9999);}
+function clrSig(){const c=document.getElementById('sig-canvas');c.getContext('2d').clearRect(0,0,c.width,c.height);}
 function savSig(){const c=document.getElementById('sig-canvas');sigData=c.toDataURL();localStorage.setItem('cai_sig',sigData);document.getElementById('sig-note').style.display='block';toast('Signature saved!','ok');}
 function upSig(inp){if(!inp.files[0])return;const fr=new FileReader();fr.onload=e=>{sigData=e.target.result;localStorage.setItem('cai_sig',sigData);document.getElementById('sig-img-prv').innerHTML=`<img src="${sigData}" style="max-height:64px;border-radius:5px;border:1px solid var(--line)">`;document.getElementById('sig-note').style.display='block';toast('Signature uploaded!','ok');};fr.readAsDataURL(inp.files[0]);}
 function setSM(m){
@@ -738,7 +739,7 @@ function setForm(d){
   sv('f-flname',d.flName);sv('f-flemail',d.flEmail);sv('f-flphone',d.flPhone);sv('f-fladdr',d.flAddr);sv('f-fltin',d.flTin);sv('f-flor',d.flOr);
   sv('f-clname',d.clName);sv('f-clco',d.clCompany);sv('f-clemail',d.clEmail);sv('f-claddr',d.clAddr);sv('f-cltin',d.clTin);sv('f-proj',d.project);
   sv('f-start',d.startDate);sv('f-end',d.endDate);sv('f-execdate',d.execDate);sv('f-expiry',d.expiry);
-  sv('f-version',d.version||'1.0');sc('f-notarize',d.notarize);sv('f-wit',d.witName);sv('f-witaddr',d.witAddr);
+  sv('f-version',d.version||'1.0');sc('f-notarize',d.notarize);sc('f-consent',d.consent);sv('f-wit',d.witName);sv('f-witaddr',d.witAddr);
   if(d.clauses)Object.entries(d.clauses).forEach(([k,v])=>{const el=document.querySelector(`[data-ckey="${k}"]`);if(el)el.value=v;});
   milestones=JSON.parse(JSON.stringify(d.milestones||[]));renderMS();
   acceptCrit=(d.acceptCrit||[]).map(t=>({text:t}));renderAC();
@@ -749,13 +750,17 @@ function setForm(d){
 // ═══════════════════════════════════
 // VALIDATION
 // ═══════════════════════════════════
+function scrollToField(id){
+  const el=document.getElementById(id);
+  if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.focus();el.style.borderColor='var(--red)';;setTimeout(()=>{el.style.borderColor='';},2500);}
+}
 function validate(d){
-  if(!d.clName){toast('Client name required','er');return false;}
-  if(!d.project){toast('Project name required','er');return false;}
-  if(!d.clEmail){toast('Client email required','er');return false;}
-  if(!d.execDate){toast('Execution date required','er');return false;}
-  if(!d.consent){toast('Please confirm the digital consent statement','er');return false;}
-  if(!parseFloat(d.rate)||parseFloat(d.rate)<=0){toast('Please enter a valid contract amount','er');return false;}
+  if(!d.clName){toast('Client name required','er');scrollToField('f-clname');return false;}
+  if(!d.project){toast('Project name required','er');scrollToField('f-proj');return false;}
+  if(!d.clEmail){toast('Client email required','er');scrollToField('f-clemail');return false;}
+  if(!d.execDate){toast('Execution date required','er');scrollToField('f-execdate');return false;}
+  if(!d.consent){toast('Please confirm the digital consent statement','er');scrollToField('f-consent');return false;}
+  if(!parseFloat(d.rate)||parseFloat(d.rate)<=0){toast('Please enter a valid contract amount','er');scrollToField('f-rate');return false;}
   if(d.milestones&&d.milestones.length){
     const t=d.milestones.reduce((s,m)=>s+(parseFloat(m.pct)||0),0);
     if(t>0&&Math.abs(t-100)>0.5){toast(`Milestone % sum is ${t.toFixed(1)}% — must equal 100%`,'er');return false;}
@@ -808,9 +813,10 @@ function buildHTML(d,status){
   }
 
   // clauses with initials per section
+  const clauseMap = d.clauses || {};
   let clauseHTML='';
   CLAUSES.forEach((cl,idx)=>{
-    const text=d.clauses[cl.key]||cl.text;
+    const text=clauseMap[cl.key]||cl.text;
     const isPlatform=cl.key==='platform_liability';
     clauseHTML+=`<h2>${idx+1}. ${cl.label}</h2>`;
     if(isPlatform){clauseHTML+=`<div class="plat"><strong>⚠ THIRD-PARTY PLATFORM NOTICE</strong>${sub(text,d)}</div>`;}
@@ -914,18 +920,87 @@ function buildHTML(d,status){
 // ═══════════════════════════════════
 // GENERATE
 // ═══════════════════════════════════
+function newContract(){
+  // Reset all form fields for a new contract
+  const fields=['f-clname','f-clco','f-clemail','f-claddr','f-cltin','f-proj','f-rate','f-fltin','f-flor','f-wit','f-witaddr','f-version'];
+  fields.forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  // Reset dropdowns to defaults
+  const sets=['f-type','f-pay','f-cur','f-cat','f-scope','f-paymethod','f-deposit','f-paydue'];
+  sets.forEach(id=>{const e=document.getElementById(id);if(e)e.selectedIndex=0;});
+  document.getElementById('f-rate').value='';
+  document.getElementById('f-revisions').value='2';
+  document.getElementById('f-latefee').value='2';
+  document.getElementById('f-version').value='1.0';
+  document.getElementById('f-notarize').checked=false;
+  document.getElementById('f-consent').checked=false;
+  // Apply settings defaults
+  if(settings.currency){const e=document.getElementById('f-cur');if(e)e.value=settings.currency;}
+  if(settings.pm){const e=document.getElementById('f-paymethod');if(e)e.value=settings.pm;}
+  // Reset dates
+  const today=new Date();
+  document.getElementById('f-start').value=today.toISOString().split('T')[0];
+  document.getElementById('f-execdate').value=today.toISOString().split('T')[0];
+  const end=new Date(today);end.setMonth(end.getMonth()+1);
+  document.getElementById('f-end').value=end.toISOString().split('T')[0];
+  const expiry=new Date(today);expiry.setDate(expiry.getDate()+30);
+  document.getElementById('f-expiry').value=expiry.toISOString().split('T')[0];
+  // Reset dynamic lists
+  milestones=[];acceptCrit=[];changeOrders=[];
+  renderMS();renderAC();renderCO();
+  // Reset contract number
+  const peekNum=()=>{const y=new Date().getFullYear();const n=(parseInt(localStorage.getItem('cai_seq')||'0'))+1;return`CE-${y}-${String(n).padStart(3,'0')}`;};
+  document.getElementById('f-cnum').value=peekNum();
+  // Reset state
+  current=null;
+  calcTotal();updProg();
+  nav('create');
+  toast('Ready for new contract','ok');
+}
+
 function genContract(){
+  const btn=document.getElementById('gen-btn');
+  if(btn){btn.disabled=true;btn.textContent='Generating…';}
   const d=getForm();
-  if(!validate(d))return;
+  if(!validate(d)){
+    if(btn){btn.disabled=false;btn.innerHTML='<svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="15" height="15"><polyline points="20 6 9 17 4 12"/></svg>Generate';}
+    return;
+  }
+  // Only generate a new contract number if this is a brand-new contract
+  if(!d.cnum||contracts.find(c=>c.id===d.cnum)){
+    d.cnum=nextNum();
+    document.getElementById('f-cnum').value=d.cnum;
+  } else {
+    // consume the sequence slot for this number
+    const n=parseInt(d.cnum.split('-').pop())||0;
+    if(n>(parseInt(localStorage.getItem('cai_seq')||'0'))){
+      localStorage.setItem('cai_seq',n);
+    }
+  }
   current={id:d.cnum,data:d,status:'Draft',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),version:d.version};
+  // Auto-save to contracts list
+  const idx=contracts.findIndex(c=>c.id===current.id);
+  if(idx>=0)contracts[idx]=current;else contracts.push(current);
+  persist();
   document.getElementById('preview-doc').innerHTML=buildHTML(d,'Draft');
-  updWF('Draft');toast('Contract generated!','ok');nav('preview');
+  updWF('Draft');toast('Contract generated and saved!','ok');nav('preview');
+  if(btn){btn.disabled=false;btn.innerHTML='<svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="15" height="15"><polyline points="20 6 9 17 4 12"/></svg>Generate';}
 }
 function saveDraft(){
   const d=getForm();
   if(!d.clName&&!d.project){toast('Enter client name or project name first','er');return;}
-  const id=nextNum();d.cnum=id;
-  contracts.push({id,data:d,status:'Draft',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()});
+  // Use existing cnum if it's not already taken by a different contract
+  let id=d.cnum;
+  if(!id||contracts.find(c=>c.id===id&&c.id!==current?.id)){id=nextNum();}
+  else{
+    // consume the sequence slot
+    const n=parseInt(id.split('-').pop())||0;
+    if(n>(parseInt(localStorage.getItem('cai_seq')||'0'))){localStorage.setItem('cai_seq',n);}
+  }
+  d.cnum=id;
+  document.getElementById('f-cnum').value=id;
+  const idx=contracts.findIndex(c=>c.id===id);
+  const entry={id,data:d,status:'Draft',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
+  if(idx>=0)contracts[idx]=entry;else contracts.push(entry);
   persist();toast('Draft saved · '+id,'ok');
 }
 function saveContract(){
@@ -954,12 +1029,59 @@ function updWF(s){document.querySelectorAll('.wfb').forEach(b=>b.classList.toggl
 // ═══════════════════════════════════
 function exportPDF(){
   if(!current){toast('Generate a contract first','er');return;}
-  try{
-    const{jsPDF}=window.jspdf;
-    const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-    const el=document.getElementById('preview-doc');
-    doc.html(el,{callback:pdf=>{pdf.save(current.id+'.pdf');toast('PDF saved: '+current.id+'.pdf','ok');},x:8,y:8,width:194,windowWidth:900});
-  }catch(e){toast('Saving as PDF via print dialog','in');window.print();}
+  toast('Opening PDF export — choose "Save as PDF" in the print dialog','in');
+  const docHTML=document.getElementById('preview-doc').innerHTML;
+  const win=window.open('','_blank','width=900,height=700');
+  if(!win){toast('Popup blocked — please allow popups for this site and try again','er');return;}
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${current.id}</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;font-size:12px;color:#1C1917;background:#fff;padding:20px}
+.doc-hd{background:linear-gradient(135deg,#C8392B,#8B1A0E);color:white;padding:20px 24px 16px;border-radius:4px 4px 0 0}
+.doc-hd h1{font-family:'DM Serif Display',serif;font-size:18px;margin-bottom:3px}
+.doc-hd .m{font-size:10px;opacity:.8;margin-top:3px}
+.doc-bd{padding:16px 24px}
+h2{font-family:'DM Serif Display',serif;font-size:13px;color:#C8392B;margin:16px 0 6px;padding-bottom:3px;border-bottom:1.5px solid #F9E8E6}
+h2:first-child{margin-top:0}
+p{margin-bottom:7px;font-size:12px;line-height:1.6}
+.parties{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px}
+.pbox{background:#FDF5F4;border:1px solid #F0C4BF;border-radius:6px;padding:10px;font-size:11px}
+.pbox strong{display:block;color:#C8392B;font-size:9px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
+.pbox span{display:block;margin-bottom:1px;color:#44403C}
+table{width:100%;border-collapse:collapse;margin-bottom:9px;font-size:11px}
+th{background:#F9E8E6;color:#8B1A0E;padding:5px 8px;text-align:left;font-weight:600;font-size:10px}
+td{padding:5px 8px;border-bottom:1px solid #F5F5F4;color:#44403C}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:9px}
+.sbox{border-top:2px solid #1C1917;padding-top:6px}
+.sbox p{font-size:10px;color:#78716C;margin:2px 0}
+.ft{text-align:center;font-size:9px;color:#A8A29E;border-top:1px solid #E7E5E4;padding:8px 24px;margin-top:10px}
+.ct{background:#FAFAF9;border-left:3px solid #F0C4BF;padding:8px 12px;border-radius:0 4px 4px 0;font-size:11px;margin-bottom:6px;line-height:1.6}
+.ib{display:flex;justify-content:flex-end;font-size:9px;color:#A8A29E;margin-top:4px;padding-top:3px;border-top:1px dashed #E7E5E4}
+.ibx{width:50px;height:16px;border-bottom:1px solid #A8A29E;display:inline-block;margin:0 3px}
+.hbox{background:#FDF5F4;border:1px solid #F0C4BF;border-radius:6px;padding:10px 13px;margin-bottom:10px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px}
+.gi span{display:block;font-size:9px;color:#A8A29E;text-transform:uppercase;letter-spacing:.3px;margin-bottom:1px}
+.gi strong{color:#1C1917;font-size:11px}
+.plat{background:#FFF7ED;border:1px solid #FED7AA;border-radius:4px;padding:8px 12px;font-size:11px;margin-bottom:6px}
+.plat strong{color:#C2410C;display:block;margin-bottom:2px;font-size:9px;letter-spacing:.3px;text-transform:uppercase}
+.wgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:8px;padding-top:8px;border-top:1px dashed #E7E5E4}
+.notary{margin-top:14px;padding:12px;border:1.5px solid #E7E5E4;border-radius:6px;font-size:10px;color:#78716C}
+.notary strong{display:block;font-size:11px;color:#1C1917;margin-bottom:6px}
+.nl{border-bottom:1px solid #1C1917;height:22px;width:100%;margin-bottom:2px}
+.exh{background:#F8F7F6;border:1.5px dashed #E7E5E4;border-radius:6px;padding:14px;text-align:center;font-size:11px;color:#A8A29E;margin-top:10px}
+.exh strong{display:block;color:#78716C;margin-bottom:3px}
+.draft-wm{position:relative}
+.draft-wm::before{content:'DRAFT';position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);font-size:100px;font-weight:900;color:rgba(200,57,43,.04);pointer-events:none;z-index:0;letter-spacing:8px}
+@media print{
+  body{padding:0}
+  @page{margin:12mm;size:A4}
+}
+</style></head><body>
+${docHTML}
+<script>window.onload=function(){window.print();window.onafterprint=function(){window.close();};}<\/script>
+</body></html>`);
+  win.document.close();
 }
 function printDoc(){window.print();}
 
@@ -1126,6 +1248,9 @@ function togDark(){
   const b=document.getElementById('tgl-dark');b.classList.toggle('on',darkOn);b.setAttribute('aria-checked',darkOn);
   const vars=darkOn?{'--w':'#1a1a1a','--line2':'#2a2a2a','--line':'#3a3a3a','--ink':'#F5F5F4','--ink2':'#D6D3D1','--ink3':'#A8A29E','--ink4':'#78716C','--pale':'#2a1210','--soft':'#3a1510'}:{'--w':'#FFFFFF','--line2':'#F5F5F4','--line':'#E7E5E4','--ink':'#1C1917','--ink2':'#44403C','--ink3':'#78716C','--ink4':'#A8A29E','--pale':'#FDF5F4','--soft':'#F9E8E6'};
   Object.entries(vars).forEach(([k,v])=>document.documentElement.style.setProperty(k,v));
+  // Keep contract preview always on white (it's a legal document)
+  const pw=document.getElementById('preview-wrap');
+  if(pw)pw.style.filter=darkOn?'brightness(0.92)':'';
   settings.dark=darkOn;saveS();
 }
 function togCompact(){
@@ -1145,24 +1270,31 @@ function syncCur(){const c=document.getElementById('set-cur').value;const e=docu
 function loadSets(){
   if(settings.dark)togDark();
   if(settings.compact)togCompact();
-  if(settings.currency){const e=document.getElementById('set-cur');if(e)e.value=settings.currency;}
+  if(settings.currency){const e=document.getElementById('set-cur');if(e)e.value=settings.currency;const f=document.getElementById('f-cur');if(f)f.value=settings.currency;}
   if(settings.law){const e=document.getElementById('set-law');if(e)e.value=settings.law;}
-  if(settings.pm){const e=document.getElementById('set-pm');if(e)e.value=settings.pm;}
+  if(settings.pm){const e=document.getElementById('set-pm');if(e)e.value=settings.pm;const f=document.getElementById('f-paymethod');if(f)f.value=settings.pm;}
 }
 function persist(){localStorage.setItem('cai_c',JSON.stringify(contracts));}
 function exportData(){const b=new Blob([JSON.stringify(contracts,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='contractai-'+Date.now()+'.json';a.click();URL.revokeObjectURL(a.href);toast('Exported '+contracts.length+' contracts','ok');}
-function importData(inp){if(!inp.files[0])return;const fr=new FileReader();fr.onload=e=>{try{const data=JSON.parse(e.target.result);if(!Array.isArray(data))throw 0;contracts=[...contracts,...data.filter(c=>!contracts.find(x=>x.id===c.id))];persist();renderLog();updDash();toast('Imported '+data.length+' contracts','ok');}catch{toast('Invalid file','er');}};fr.readAsText(inp.files[0]);}
+function importData(inp){if(!inp.files[0])return;const fr=new FileReader();fr.onload=e=>{try{const data=JSON.parse(e.target.result);if(!Array.isArray(data))throw new Error('Not array');contracts=[...contracts,...data.filter(c=>!contracts.find(x=>x.id===c.id))];persist();renderLog();updDash();toast('Imported '+data.length+' contracts','ok');}catch(err){toast('Invalid file — expected JSON array','er');}};fr.readAsText(inp.files[0]);}
 function resetAll(){if(!confirm('Delete ALL data? Cannot be undone.'))return;contracts=[];settings={};sigData=null;milestones=[];acceptCrit=[];changeOrders=[];['cai_c','cai_s','cai_sig','cai_seq','cai_as'].forEach(k=>localStorage.removeItem(k));renderLog();updDash();toast('All data cleared','ok');}
 
 // ═══════════════════════════════════
 // TOAST
 // ═══════════════════════════════════
-function toast(msg,type='ok'){
+function toast(msg,type){
+  type=type||'ok';
+  const icons={ok:'✓',er:'✕','in':'ℹ'};
+  const icon=icons[type]||'ℹ';
+  const borderColor=type==='ok'?'#22C55E':type==='er'?'#EF4444':'#C8392B';
   const el=document.createElement('div');
-  el.style.cssText='background:var(--ink);color:var(--w);padding:10px 15px;border-radius:6px;font-size:14px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.22);animation:pgin .25s ease;display:flex;align-items:center;gap:9px;border-left:4px solid '+(type==='ok'?'#22C55E':type==='er'?'#EF4444':'var(--red)');
-  el.innerHTML=`<span>${{ok:'✓',er:'✕',in:'ℹ'}[type]||'ℹ'}</span><span>${msg}</span>`;
-  document.getElementById('toast').appendChild(el);
-  setTimeout(()=>el.remove(),3200);
+  el.style.cssText='background:var(--ink);color:var(--w);padding:10px 15px;border-radius:6px;font-size:14px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.22);animation:pgin .25s ease;display:flex;align-items:center;gap:9px;margin-bottom:6px;border-left:4px solid '+borderColor;
+  el.textContent='';
+  const s=document.createElement('span');s.textContent=icon;
+  const t=document.createElement('span');t.textContent=msg;
+  el.appendChild(s);el.appendChild(t);
+  const wrap=document.getElementById('toast');
+  if(wrap){wrap.appendChild(el);setTimeout(()=>{if(el.parentNode)el.parentNode.removeChild(el);},3200);}
 }
 
 // ═══════════════════════════════════
@@ -1175,8 +1307,9 @@ window.addEventListener('load',()=>{
   loadSets();
   updDash();
 
-  // Set contract number
-  document.getElementById('f-cnum').value=nextNum();
+  // Set contract number (peek without incrementing)
+  const peekNum=()=>{const y=new Date().getFullYear();const n=(parseInt(localStorage.getItem('cai_seq')||'0'))+1;return`CE-${y}-${String(n).padStart(3,'0')}`;};
+  document.getElementById('f-cnum').value=peekNum();
 
   // Default dates
   const today=new Date();
